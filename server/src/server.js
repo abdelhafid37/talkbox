@@ -1,6 +1,16 @@
-const app = require("./app");
+const dotenv = require("dotenv");
+dotenv.config();
 
-const PORT = 5000;
-app.listen(PORT, () => {
-  console.log(`TalkBox Server Running on Port ${PORT}`);
-});
+const app = require("./app");
+const connectDB = require("./config/db");
+
+const PORT = process.env.PORT;
+
+async function startup() {
+  await connectDB();
+  app.listen(PORT, () => {
+    console.log(`[SERVER] Running on port ${PORT}`);
+  });
+}
+
+startup();
