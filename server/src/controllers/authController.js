@@ -128,6 +128,14 @@ async function loginController(req, res) {
         message: "Invalid email or password.",
       });
     }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+      return res.status(401).json({
+        message: "Invalid email or password.",
+      });
+    }
   } catch (error) {
     console.error(`[AUTH][LOGIN] Failed to login user: ${error.message}`);
     return res.status(500).json({
