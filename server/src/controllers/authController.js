@@ -98,6 +98,45 @@ async function registerController(req, res) {
   }
 }
 
+async function loginController(req, res) {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        message: "Email and password are required.",
+      });
+    }
+
+    if (typeof email !== "string") {
+      return res.status(400).json({
+        message: "Invalid email.",
+      });
+    }
+
+    if (typeof password !== "string") {
+      return res.status(400).json({
+        message: "Invalid password.",
+      });
+    }
+
+    const trimmedEmail = email.trim();
+    const user = await User.findOne({ email: trimmedEmail });
+
+    if (!user) {
+      return res.status(401).json({
+        message: "Invalid email or password.",
+      });
+    }
+  } catch (error) {
+    console.error(`[AUTH][LOGIN] Failed to login user: ${error.message}`);
+    return res.status(500).json({
+      message: "Internal server error.",
+    });
+  }
+}
+
 module.exports = {
   registerController,
+  loginController,
 };
