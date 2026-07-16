@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 async function registerController(req, res) {
   try {
@@ -92,6 +93,7 @@ async function registerController(req, res) {
     console.error(
       `[AUTH][REGISTER] Failed to register user: ${error.message}.`,
     );
+
     return res.status(500).json({
       message: "Internal server error",
     });
@@ -136,8 +138,16 @@ async function loginController(req, res) {
         message: "Invalid email or password.",
       });
     }
+
+    const JWT_SECRET = process.env.JWT_SECRET;
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    return res.status(200).json({ token });
   } catch (error) {
     console.error(`[AUTH][LOGIN] Failed to login user: ${error.message}`);
+
     return res.status(500).json({
       message: "Internal server error.",
     });
