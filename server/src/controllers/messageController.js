@@ -1,19 +1,15 @@
 const Message = require("../models/Message");
 
-async function messageController(req, res) {
+async function createMessageController(req, res) {
   try {
     const sender = req.user.userId;
     const receiver = req.body.receiver;
     const content = req.body.content;
 
-    if (!sender || !receiver || !content) {
+    if (!receiver || !content) {
       return res
         .status(400)
-        .json({ message: "Sender, receiver, and content are required." });
-    }
-
-    if (typeof sender !== "string") {
-      return res.status(400).json({ message: "Invalid sender." });
+        .json({ message: "Receiver and content are required." });
     }
 
     if (typeof receiver !== "string") {
@@ -44,4 +40,23 @@ async function messageController(req, res) {
   }
 }
 
-module.exports = messageController;
+async function getMessagesController(req, res) {
+  try {
+    const userId = req.user.userId;
+
+    const messages = await Message.find({
+      $or: [{ sender: userId }, { receiver: userId }],
+    });
+
+    return res.status(200).json(messages);
+  } catch (error) {
+    console.error(`[MESSAGE] Failed to get messages: ${error.message}`);
+
+    return res.status(500).json({ message: "Internal server error." });
+  }
+}
+
+module.exports = {
+  createMessageController,
+  getMessagesController,
+};
