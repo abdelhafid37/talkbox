@@ -1,12 +1,12 @@
 const express = require("express");
 const app = express();
 
-const authRouter = require("./routes/authRoutes");
-const userRouter = require("./routes/userRoutes");
+const authRoutes = require("./routes/authRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 app.use(express.json());
-app.use("/api/auth", authRouter);
-app.use("/api/user", userRouter);
+app.use("/api/auth", authRoutes);
+app.use("/api/user", userRoutes);
 
 app.get("/", (req, res) => {
   res.send("TalkBox API Running");
