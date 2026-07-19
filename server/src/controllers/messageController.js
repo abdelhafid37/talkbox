@@ -56,7 +56,42 @@ async function getMessagesController(req, res) {
   }
 }
 
+async function getConversationController(req, res) {
+  try {
+    const otherUserId = req.params.userId;
+    const userId = req.user.userId;
+
+    if (!otherUserId) {
+      return res.status(400).json({ message: "Missing other user id." });
+    }
+
+    if (typeof otherUserId !== "string") {
+      return res.status(400).json({ message: "Invalid other user id." });
+    }
+
+    const conversation = await Message.find({
+      $or: [
+        {
+          sender: userId,
+          receiver: otherUserId,
+        },
+        {
+          sender: otherUserId,
+          receiver: userId,
+        },
+      ],
+    }).sort({ createdAt: 1 });
+
+    return res.status(200).json(conversation);
+  } catch (error) {
+    console.error(`[MESSAGE] Failed to get conversation: ${error.message}`);
+
+    return res.status(500).json({ message: "Internal server error." });
+  }
+}
+
 module.exports = {
   createMessageController,
   getMessagesController,
+  getConversationController,
 };
