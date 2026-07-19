@@ -80,7 +80,10 @@ async function getConversationController(req, res) {
           receiver: userId,
         },
       ],
-    }).sort({ createdAt: 1 });
+    })
+      .sort({ createdAt: 1 })
+      .populate("sender", "username")
+      .populate("receiver", "username");
 
     return res.status(200).json(conversation);
   } catch (error) {
