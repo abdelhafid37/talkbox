@@ -10,20 +10,19 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { login } from "@/services/authService";
+import useAuth from "@/hooks/useAuth";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const { setToken } = useAuth();
+
   async function handleSubmit(event) {
     event.preventDefault();
 
-    const data = await login({
-      email,
-      password,
-    });
-
-    console.log(data);
+    const data = await login({ email, password });
+    setToken(data.token);
   }
 
   return (
