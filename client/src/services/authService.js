@@ -12,4 +12,16 @@ async function register(userData) {
   return response.data;
 }
 
-export { login, register };
+async function getCurrentUser() {
+  const token = localStorage.getItem("token");
+
+  const response = await api.get("/user/me", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data;
+}
+
+export { login, register, getCurrentUser };

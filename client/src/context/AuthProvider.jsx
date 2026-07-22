@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext";
+import { getCurrentUser } from "@/services/authService";
 
 function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -13,7 +14,19 @@ function AuthProvider({ children }) {
   function logout() {
     localStorage.removeItem("token");
     setTokenState(null);
+    setUser(null);
   }
+
+  useEffect(() => {
+    if (!token) return;
+
+    async function fetchUser() {
+      const user = await getCurrentUser();
+      setUser(user);
+    }
+
+    fetchUser();
+  }, [token]);
 
   return (
     <AuthContext.Provider
