@@ -10,6 +10,11 @@ function AuthProvider({ children }) {
     localStorage.setItem("token", token);
   }
 
+  function logout() {
+    localStorage.removeItem("token");
+    setTokenState(null);
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -17,6 +22,7 @@ function AuthProvider({ children }) {
         token,
         setUser,
         setToken,
+        logout,
       }}
     >
       {children}

@@ -1,8 +1,15 @@
+import { Button } from "@/components/ui/button";
 import useAuth from "@/hooks/useAuth";
 
 function ChatPage() {
-  const { token } = useAuth();
+  const { token, logout } = useAuth();
 
-  return <h1>Chat Page, Token: {token}</h1>;
+  return (
+    <div>
+      <h1 className="truncate">Chat Page, Token: {token}</h1>
+      <Button onClick={logout}>Logout</Button>
+    </div>
+  );
 }
+
 export default ChatPage;
