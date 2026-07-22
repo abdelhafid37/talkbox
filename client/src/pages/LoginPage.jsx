@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -5,10 +7,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import {
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import { login } from "@/services/authService";
 import useAuth from "@/hooks/useAuth";
 
@@ -17,12 +23,16 @@ function LoginPage() {
   const [password, setPassword] = useState("");
 
   const { setToken } = useAuth();
+  const navigate = useNavigate();
 
   async function handleSubmit(event) {
     event.preventDefault();
 
     const data = await login({ email, password });
+
     setToken(data.token);
+
+    navigate("/chat");
   }
 
   return (
@@ -59,6 +69,10 @@ function LoginPage() {
               </Field>
               <Field>
                 <Button type="submit">Login</Button>
+                <FieldDescription>
+                  Don&apos;t have an account?{" "}
+                  <Link to="/register">Sign up</Link>
+                </FieldDescription>
               </Field>
             </FieldGroup>
           </form>
