@@ -43,6 +43,7 @@ function AuthProvider({ children }) {
       console.log("Socket Connected:", socket.id);
 
       socket.emit("join", {
+        userId: user._id,
         username: user.username,
       });
     });
