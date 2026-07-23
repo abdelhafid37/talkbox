@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import useAuth from "@/hooks/useAuth";
+import socket from "@/services/socket";
 
 function ChatPage() {
   const { logout, user } = useAuth();
@@ -9,7 +10,20 @@ function ChatPage() {
       <h1 className="text-2xl mb-6">
         Welcome, {user ? user.username : "Loading..."}
       </h1>
+
       <Button onClick={logout}>Logout</Button>
+
+      <Button
+        onClick={() => {
+          socket.emit("sendMessage", {
+            text: "Hello from the client!",
+          });
+        }}
+        variant="outline"
+        className="ml-2"
+      >
+        Send Test Message
+      </Button>
     </div>
   );
 }

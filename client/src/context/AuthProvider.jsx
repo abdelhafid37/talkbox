@@ -56,10 +56,15 @@ function AuthProvider({ children }) {
       console.log(`${data.username} joined the chat`);
     });
 
+    socket.on("newMessage", (data) => {
+      console.log(data);
+    });
+
     return () => {
       socket.off("connect");
       socket.off("welcome");
       socket.off("userJoined");
+      socket.off("newMessage");
     };
   }, [token, user]);
 

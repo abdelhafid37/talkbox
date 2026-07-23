@@ -16,6 +16,7 @@ function initializeSocket(server) {
       message: "Welcome to talkbox!",
     });
 
+    // listener for joining the app
     socket.on("join", (data) => {
       console.log(
         `[SOCKET.IO] [JOIN] ${data.username} joined with socket ${socket.id}.`,
@@ -30,6 +31,14 @@ function initializeSocket(server) {
       });
     });
 
+    // listener for sending messages
+    socket.on("sendMessage", (data) => {
+      console.log(data);
+
+      io.emit("newMessage", data);
+    });
+
+    // listener for disconnecting
     socket.on("disconnect", () => {
       console.log(`[SOCKET.IO] [DISCONNECT] ${socket.id} disconnect.`);
 
