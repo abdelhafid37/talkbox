@@ -9,6 +9,20 @@ function initializeSocket(server) {
 
   io.on("connection", (socket) => {
     console.log(`[SOCKET.IO] [CONNECTION] Client connected: ${socket.id}`);
+
+    socket.emit("welcome", {
+      message: "Welcome to talkbox!",
+    });
+
+    socket.on("join", (data) => {
+      console.log(
+        `[SOCKET.IO] [JOIN] ${data.username} joined with socket ${socket.id}`,
+      );
+
+      io.emit("userJoined", {
+        username: data.username,
+      });
+    });
   });
 }
 

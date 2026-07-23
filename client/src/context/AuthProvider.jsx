@@ -30,15 +30,37 @@ function AuthProvider({ children }) {
   }, [token]);
 
   useEffect(() => {
-    if (token) {
-      socket.connect();
-      socket.on("connect", () => {
-        console.log("Socket Connected:", socket.id);
-      });
-    } else {
+    if (!token) {
       socket.disconnect();
+      return;
     }
-  }, [token]);
+
+    if (!user) return;
+
+    socket.connect();
+
+    socket.on("connect", () => {
+      console.log("Socket Connected:", socket.id);
+
+      socket.emit("join", {
+        username: user.username,
+      });
+    });
+
+    socket.on("welcome", (data) => {
+      console.log(data);
+    });
+
+    socket.on("userJoined", (data) => {
+      console.log(`${data.username} joined the chat`);
+    });
+
+    return () => {
+      socket.off("connect");
+      socket.off("welcome");
+      socket.off("userJoined");
+    };
+  }, [token, user]);
 
   return (
     <AuthContext.Provider
