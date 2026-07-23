@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext";
 import { getCurrentUser } from "@/services/authService";
+import socket from "@/services/socket";
 
 function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -26,6 +27,17 @@ function AuthProvider({ children }) {
     }
 
     fetchUser();
+  }, [token]);
+
+  useEffect(() => {
+    if (token) {
+      socket.connect();
+      socket.on("connect", () => {
+        console.log("Socket Connected:", socket.id);
+      });
+    } else {
+      socket.disconnect();
+    }
   }, [token]);
 
   return (
