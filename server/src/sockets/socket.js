@@ -1,4 +1,5 @@
 const { Server } = require("socket.io");
+const Message = require("../models/Message");
 
 const onlineUsers = new Map();
 
@@ -32,10 +33,22 @@ function initializeSocket(server) {
     });
 
     // listener for sending messages
-    socket.on("sendMessage", (data) => {
-      console.log(data);
+    socket.on("sendMessage", async (data) => {
+      try {
+        console.log(data);
 
-      io.emit("newMessage", data);
+        const message = await Message.create({
+          sender: "6a60d62fd19150b6bfdab4c6",
+          receiver: "6a5bbdfb8e4f2434c0447eda",
+          content: data.text,
+        });
+
+        console.log(message);
+
+        io.emit("newMessage", data);
+      } catch (error) {
+        console.error(`[SOCKET.IO] [MESSAGE] ${error.message}`);
+      }
     });
 
     // listener for disconnecting
