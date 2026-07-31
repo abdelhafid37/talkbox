@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext";
-import { getCurrentUser } from "@/services/authService";
 import socket from "@/services/socket";
+import { getCurrentUser } from "@/services/userService";
 
 function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -37,35 +37,19 @@ function AuthProvider({ children }) {
 
     if (!user) return;
 
+    socket.auth = {
+      token,
+    };
+
     socket.connect();
 
     socket.on("connect", () => {
       console.log("Socket Connected:", socket.id);
 
-      socket.emit("join", {
-        userId: user._id,
-        username: user.username,
-      });
+      socket.emit("join");
     });
 
-    socket.on("welcome", (data) => {
-      console.log(data);
-    });
-
-    socket.on("userJoined", (data) => {
-      console.log(`${data.username} joined the chat`);
-    });
-
-    socket.on("newMessage", (data) => {
-      console.log(data);
-    });
-
-    return () => {
-      socket.off("connect");
-      socket.off("welcome");
-      socket.off("userJoined");
-      socket.off("newMessage");
-    };
+    return () => socket.off("connect");
   }, [token, user]);
 
   return (

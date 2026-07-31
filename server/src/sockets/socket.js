@@ -1,5 +1,7 @@
 const { Server } = require("socket.io");
 const Message = require("../models/Message");
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
 const onlineUsers = new Map();
 
@@ -10,6 +12,16 @@ function initializeSocket(server) {
     },
   });
 
+  io.use(async (socket, next) => {
+    const token = socket.handshake.auth.token;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const user = await User.findById(decoded.userId);
+
+    socket.user = user;
+    next();
+  });
+
   io.on("connection", (socket) => {
     console.log(`[SOCKET.IO] [CONNECTION] Client connected: ${socket.id}.`);
 
@@ -17,41 +29,41 @@ function initializeSocket(server) {
       message: "Welcome to talkbox!",
     });
 
-    // listener for joining the app
-    socket.on("join", (data) => {
+    socket.on("join", () => {
       console.log(
-        `[SOCKET.IO] [JOIN] ${data.username} joined with socket ${socket.id}.`,
+        `[SOCKET.IO] [JOIN] ${socket.user.username} joined with socket ${socket.id}.`,
       );
 
-      onlineUsers.set(data.userId, socket.id);
+      onlineUsers.set(socket.user._id.toString(), socket.id);
       console.log(onlineUsers);
-      // console.log(data);
 
       io.emit("userJoined", {
-        username: data.username,
+        username: socket.user.username,
       });
     });
 
-    // listener for sending messages
     socket.on("sendMessage", async (data) => {
       try {
-        console.log(data);
-
         const message = await Message.create({
-          sender: "6a60d62fd19150b6bfdab4c6",
-          receiver: "6a5bbdfb8e4f2434c0447eda",
+          sender: socket.user._id,
+          receiver: data.receiverId,
           content: data.text,
         });
 
-        console.log(message);
+        const populatedMessage = await message.populate([
+          { path: "sender", select: "username" },
+          { path: "receiver", select: "username" },
+        ]);
 
-        io.emit("newMessage", data);
+        const receiverSocketId = onlineUsers.get(data.receiverId);
+
+        socket.emit("newMessage", populatedMessage);
+        io.to(receiverSocketId).emit("newMessage", populatedMessage);
       } catch (error) {
         console.error(`[SOCKET.IO] [MESSAGE] ${error.message}`);
       }
     });
 
-    // listener for disconnecting
     socket.on("disconnect", () => {
       console.log(`[SOCKET.IO] [DISCONNECT] ${socket.id} disconnect.`);
 
