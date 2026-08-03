@@ -1,21 +1,17 @@
-import { cn } from "@/lib/utils"
-import { HugeiconsIcon } from "@hugeicons/react"
-import { Loading03Icon } from "@hugeicons/core-free-icons"
+import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
 
-function Spinner({
-  className,
-  ...props
-}) {
+function Spinner({ className, ...props }) {
   return (
-    <HugeiconsIcon
-      icon={Loading03Icon}
+    <Loader2
       strokeWidth={2}
-      data-slot="spinner"
       role="status"
+      data-slot="spinner"
       aria-label="Loading"
       className={cn("size-4 animate-spin", className)}
-      {...props} />
+      {...props}
+    />
   );
 }
 
-export { Spinner }
+export { Spinner };

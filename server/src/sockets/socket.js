@@ -25,10 +25,6 @@ function initializeSocket(server) {
   io.on("connection", (socket) => {
     console.log(`[SOCKET.IO] [CONNECTION] Client connected: ${socket.id}.`);
 
-    socket.emit("welcome", {
-      message: "Welcome to talkbox!",
-    });
-
     socket.on("join", () => {
       console.log(
         `[SOCKET.IO] [JOIN] ${socket.user.username} joined with socket ${socket.id}.`,
@@ -36,10 +32,6 @@ function initializeSocket(server) {
 
       onlineUsers.set(socket.user._id.toString(), socket.id);
       console.log(onlineUsers);
-
-      io.emit("userJoined", {
-        username: socket.user.username,
-      });
     });
 
     socket.on("sendMessage", async (data) => {
