@@ -20,7 +20,7 @@ export default function ChatSidebar({
   setSelectedUser,
   isUsersLoading,
 }) {
-  const { logout } = useAuth();
+  const { logout, onlineUsers } = useAuth();
   const { setOpenMobile } = useSidebar();
 
   return (
@@ -33,24 +33,37 @@ export default function ChatSidebar({
           <SidebarMenu>
             {!isUsersLoading ? (
               users.length > 0 ? (
-                users.map((user) => (
-                  <SidebarMenuItem key={user._id}>
-                    <SidebarMenuButton
-                      onClick={() => {
-                        setSelectedUser(user);
-                        setOpenMobile(false);
-                      }}
-                      className={`h-fit py-3.5 ${
-                        selectedUser?._id === user._id
-                          ? "bg-sidebar-accent"
-                          : ""
-                      }`}
-                    >
-                      <CircleUserRound className="size-6!" strokeWidth={1.25} />
-                      <span className="text-base">{user.username}</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))
+                users.map((user) => {
+                  const isOnline = onlineUsers.includes(user._id);
+
+                  return (
+                    <SidebarMenuItem key={user._id}>
+                      <SidebarMenuButton
+                        onClick={() => {
+                          setSelectedUser(user);
+                          setOpenMobile(false);
+                        }}
+                        className={`h-fit py-3.5 ${
+                          selectedUser?._id === user._id
+                            ? "bg-sidebar-accent"
+                            : ""
+                        }`}
+                      >
+                        <div className="relative size-fit">
+                          <CircleUserRound
+                            className="size-6!"
+                            strokeWidth={1.25}
+                          />
+
+                          {isOnline && (
+                            <span className="size-2 shrink-0 bg-emerald-500 rounded-full block absolute left-full top-full -translate-full ring-2 ring-sidebar" />
+                          )}
+                        </div>
+                        <span className="text-base">{user.username}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })
               ) : (
                 <SidebarMenuItem className="px-3.5">
                   <p className="text-sm">No users yet!</p>

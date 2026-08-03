@@ -6,16 +6,20 @@ import { getCurrentUser } from "@/services/userService";
 function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setTokenState] = useState(() => localStorage.getItem("token"));
+  const [onlineUsers, setOnlineUsers] = useState([]);
 
   function setToken(token) {
     setTokenState(token);
+
     localStorage.setItem("token", token);
   }
 
   function logout() {
     localStorage.removeItem("token");
+
     setTokenState(null);
     setUser(null);
+    setOnlineUsers([]);
   }
 
   useEffect(() => {
@@ -49,7 +53,14 @@ function AuthProvider({ children }) {
       socket.emit("join");
     });
 
-    return () => socket.off("connect");
+    socket.on("onlineUsers", (users) => {
+      setOnlineUsers(users);
+    });
+
+    return () => {
+      socket.off("connect");
+      socket.off("onlineUsers");
+    };
   }, [token, user]);
 
   return (
@@ -57,6 +68,7 @@ function AuthProvider({ children }) {
       value={{
         user,
         token,
+        onlineUsers,
         setUser,
         setToken,
         logout,

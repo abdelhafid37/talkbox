@@ -22,6 +22,10 @@ function initializeSocket(server) {
     next();
   });
 
+  function emitOnlineUsers() {
+    io.emit("onlineUsers", [...onlineUsers.keys()]);
+  }
+
   io.on("connection", (socket) => {
     console.log(`[SOCKET.IO] [CONNECTION] Client connected: ${socket.id}.`);
 
@@ -31,6 +35,9 @@ function initializeSocket(server) {
       );
 
       onlineUsers.set(socket.user._id.toString(), socket.id);
+
+      emitOnlineUsers();
+
       console.log(onlineUsers);
     });
 
@@ -62,6 +69,7 @@ function initializeSocket(server) {
       for (const [userId, socketId] of onlineUsers) {
         if (socketId === socket.id) {
           onlineUsers.delete(userId);
+          emitOnlineUsers();
           break;
         }
       }
