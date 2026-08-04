@@ -8,18 +8,31 @@ const onlineUsers = new Map();
 function initializeSocket(server) {
   const io = new Server(server, {
     cors: {
-      origin: "http://localhost:5173",
+      origin: process.env.CLIENT_URL,
     },
   });
 
   io.use(async (socket, next) => {
-    const token = socket.handshake.auth.token;
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    try {
+      const token = socket.handshake.auth?.token;
 
-    const user = await User.findById(decoded.userId);
+      if (!token) {
+        return next(new Error("Unauthorized."));
+      }
 
-    socket.user = user;
-    next();
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+      const user = await User.findById(decoded.userId);
+
+      if (!user) {
+        return next(new Error("Unauthorized."));
+      }
+
+      socket.user = user;
+      next();
+    } catch (error) {
+      next(new Error("Unauthorized."));
+    }
   });
 
   function emitOnlineUsers() {

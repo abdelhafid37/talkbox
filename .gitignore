@@ -5,9 +5,10 @@ node_modules/
 dist/
 dist-ssr/
 
-# Environment variable
+# Environment variables
 .env
 .env.*
+!.env.example
 
 # Logs
 logs/
