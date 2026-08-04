@@ -56,6 +56,7 @@ export default function ChatPage() {
     if (!selectedUser) return;
 
     async function fetchConversation() {
+      setMessages([]);
       setIsMessagesLoading(true);
 
       try {
